@@ -1,10 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const PAYPAL_CLIENT_ID = "AXJZ3V8cdUCKMTBrSLrGUq7nx9r6Wtb2qVQpFbvDD3eyvstitOSxtq5srLvACd9LcNCicZ5ckk96Bi-y";
-const PAYPAL_API_BASE = "https://api-m.paypal.com";
+const PAYPAL_CLIENT_ID =
+  process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID ||
+  "AXJZ3V8cdUCKMTBrSLrGUq7nx9r6Wtb2qVQpFbvDD3eyvstitOSxtq5srLvACd9LcNCicZ5ckk96Bi-y";
+
+const PAYPAL_CLIENT_SECRET =
+  process.env.PAYPAL_CLIENT_SECRET ||
+  "Aezw5yK4Uc_A7K7v1jpy1cy2NR6BflgnCi7vL1KbLZYOfV7VfFS08unYj8Q6uUr7YjB5SHRafsFaUQp_";
+
+const PAYPAL_API_BASE =
+  process.env.PAYPAL_API_BASE || "https://api-m.paypal.com";
 
 async function getPayPalAccessToken(): Promise<string> {
-  const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:`).toString("base64");
+  if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
+    throw new Error("PayPal credentials are not configured");
+  }
+  const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`).toString("base64");
   const response = await fetch(`${PAYPAL_API_BASE}/v1/oauth2/token`, {
     method: "POST",
     headers: {
